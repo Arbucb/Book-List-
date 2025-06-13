@@ -65,10 +65,3 @@ with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as csvfile:
                 "OL Work Key": "Error"
             })
         time.sleep(1)  # Be kind to Open Library's servers
-
-# Save the script to a file
-script_path = r"d:\SynologyDrive\Brendan\Programs\Python\Book Lists\fetch_openlibrary_data.py"
-with open(script_path, "w", encoding="utf-8") as f:
-    f.write(script_content)
-
-script_path
