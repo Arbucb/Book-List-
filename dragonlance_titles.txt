@@ -156,14 +156,12 @@ The Black Talon
 The Sellsword
 Renegade Wizards
 Dragons of the Hourglass Mage
-Dragonships of Vindras (incorrectly counted — omit)
 The Gargoyle King
 The Forest King
 The Survivors
 Dragons of Deceit
-Dragons of Fate
 Dragons of Eternity
 The Forest King
 The Survivors
-Dragons of Deceit
-Dragons of Fate
+
+

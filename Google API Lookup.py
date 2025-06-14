@@ -1,40 +1,52 @@
+"""
+Fetch Dragonlance book metadata from Google's API.
+
+Given a CSV file of titles and output data from OpenLibrary API, the script writes a new CSV containing enriched metadata from Google Books API.
+
+Author: Brendan Arbuckle
+Date: 2025-06-13
+"""
+
 import csv
 import requests
 import time
 
-INPUT_FILE = "enriched_dragonlance_data.csv"
-OUTPUT_FILE = "final_dragonlance_data.csv"
+def main():
+    print("This script fetches book data from Google's API based on titles provided in a text file.")
 
-def query_google_books(title, isbn=None):
-    try:
-        query = f"intitle:{title}"
-        if isbn:
-            query += f"+isbn:{isbn}"
-        url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            items = response.json().get("items")
+    INPUT_FILE = "enriched_dragonlance_data.csv"
+    OUTPUT_FILE = "google_enriched_dragonlance_data.csv"
+
+    def query_google_books(title, isbn=None):
+        try:
+            query = f"intitle:{title}"
+            if isbn:
+                query += f"+isbn:{isbn}"
+                url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
+                response = requests.get(url)
+            if response.status_code == 200:
+                    items = response.json().get("items")
             if items:
                 volume_info = items[0].get("volumeInfo", {})
-                return {
-                    "Title": volume_info.get("title", ""),
-                    "Author(s)": ", ".join(volume_info.get("authors", [])),
-                    "Publisher": volume_info.get("publisher", ""),
-                    "Publish Year": volume_info.get("publishedDate", ""),
-                    "Page Count": volume_info.get("pageCount", ""),
-                    "Categories": ", ".join(volume_info.get("categories", [])) if "categories" in volume_info else "",
-                    "Description": volume_info.get("description", ""),
-                    "Cover Image": volume_info.get("imageLinks", {}).get("thumbnail", "")
+            return {
+                "Title": volume_info.get("title", ""),
+                "Author(s)": ", ".join(volume_info.get("authors", [])),
+                "Publisher": volume_info.get("publisher", ""),
+                "Publish Year": volume_info.get("publishedDate", ""),
+                "Page Count": volume_info.get("pageCount", ""),
+                "Categories": ", ".join(volume_info.get("categories", [])) if "categories" in volume_info else "",
+                "Description": volume_info.get("description", ""),
+                "Cover Image": volume_info.get("imageLinks", {}).get("thumbnail", "")
                 }
-    except Exception as e:
-        print(f"Error querying Google Books for '{title}': {e}")
-    return {}
+        except Exception as e:
+            print(f"Error querying Google Books for '{title}': {e}")
+        return {}
 
-with open(INPUT_FILE, "r", encoding="utf-8") as infile, open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as outfile:
-    reader = csv.DictReader(infile)
-    fieldnames = reader.fieldnames + ["Page Count", "Categories", "Description", "Cover Image"]
-    writer = csv.DictWriter(outfile, fieldnames=fieldnames)
-    writer.writeheader()
+    with open(INPUT_FILE, "r", encoding="utf-8") as infile, open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as outfile:
+        reader = csv.DictReader(infile)
+        fieldnames = reader.fieldnames + ["Page Count", "Categories", "Description", "Cover Image"]
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        writer.writeheader()
 
     for row in reader:
         title = row.get("Title")
@@ -56,3 +68,8 @@ with open(INPUT_FILE, "r", encoding="utf-8") as infile, open(OUTPUT_FILE, "w", n
 
         writer.writerow(row)
         time.sleep(1)  # Respect rate limits
+    
+    print("Google API Data enrichment complete. Output saved to", {OUTPUT_FILE})
+
+if __name__ == "__main__":
+    main()
